@@ -1,8 +1,7 @@
-# 🚀 Sistema de Gestão de Estoque - API
 
 <div align="center">
 
-# Sistema de Gestão de Estoque - Backend
+# 🚀 Sistema de Gestão de Estoque - Backend
 
 API REST desenvolvida com Java e Spring Boot para gerenciamento de estoque, autenticação de usuários e persistência de dados em PostgreSQL.
 
