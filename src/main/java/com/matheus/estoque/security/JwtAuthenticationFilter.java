@@ -1,6 +1,5 @@
 package com.matheus.estoque.security;
 
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.PublicKey;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -27,6 +25,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(
+            HttpServletRequest request
+    ) {
+        String path = request.getServletPath();
+
+        return "OPTIONS".equalsIgnoreCase(request.getMethod()) ||
+                path.startsWith("/auth/");
     }
 
     @Override
@@ -45,25 +53,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        System.out.println("TOKEN EXTRAÍDO");
-
-        boolean valid = jwtService.isTokenValid(token);
-
-        System.out.println("TOKEN VÁLIDO? " + valid);
-
-        if (!valid) {
+        if (!jwtService.isTokenValid(token)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String email = jwtService.extractEmail(token);
 
-        System.out.println("EMAIL: " + email);
-
         UserDetails userDetails =
                 userDetailsService.loadUserByUsername(email);
-
-        System.out.println("USER DETAILS CARREGADO");
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
@@ -72,12 +70,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities()
                 );
 
+        authentication.setDetails(
+                new WebAuthenticationDetailsSource()
+                        .buildDetails(request)
+        );
+
         SecurityContextHolder.getContext()
                 .setAuthentication(authentication);
 
-        System.out.println("AUTH SETADA NO CONTEXT");
-
         filterChain.doFilter(request, response);
     }
-
 }

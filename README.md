@@ -7,6 +7,7 @@ API REST desenvolvida com Java e Spring Boot para gerenciamento de estoque, aute
 
 <br>
 
+<<<<<<< HEAD
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge\&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=for-the-badge\&logo=springboot)
 ![Spring Security](https://img.shields.io/badge/Spring_Security-Authentication-6DB33F?style=for-the-badge\&logo=springsecurity)
@@ -76,6 +77,24 @@ Service
 Repository
     ↓
 PostgreSQL
+=======
+```env
+DATABASE_URL=jdbc:postgresql://localhost:5432/stock_management
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+JPA_DDL_AUTO=update
+JPA_SHOW_SQL=false
+SECURITY_LOG_LEVEL=INFO
+CORS_ALLOWED_ORIGINS=http://localhost:*
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=seu-email@gmail.com
+MAIL_PASSWORD=sua-senha-de-app
+MAIL_SMTP_AUTH=true
+MAIL_SMTP_STARTTLS_ENABLE=true
+MAIL_FROM=seu-email@gmail.com
+FRONTEND_RESET_PASSWORD_URL=http://localhost:5173/reset-password
+>>>>>>> 20f231f (adiciona cadastro de usuario)
 ```
 
 Estrutura principal:
