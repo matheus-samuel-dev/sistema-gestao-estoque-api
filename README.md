@@ -37,19 +37,27 @@ O objetivo do projeto é permitir o controle de produtos, categorias e movimenta
 
 ---
 
-# 🌐 Aplicação Online
+# 🌐 Demonstração
 
-### 🔗 Sistema em Produção
+### 🚀 Aplicação Online
 
-https://sistema-gestao-estoque-two.vercel.app
+Acesse a versão em produção:
 
-### 💻 Repositórios
+🔗 https://sistema-gestao-estoque-two.vercel.app
 
-**Frontend**
+---
+
+## 🔗 Repositórios do Projeto
+
+### Frontend (React + Vite)
+
+Interface web responsável pela experiência do usuário.
 
 https://github.com/matheus-samuel-dev/sistema-gestao-estoque
 
-**Backend**
+### Backend (Java + Spring Boot)
+
+API REST responsável por autenticação, regras de negócio e persistência de dados.
 
 https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api
 
