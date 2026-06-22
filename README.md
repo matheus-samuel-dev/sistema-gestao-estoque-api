@@ -79,19 +79,6 @@ Repository
 PostgreSQL
 =======
 
-DATABASE_URL=jdbc:postgresql://localhost:5432/stock_management
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=postgres
-JPA_DDL_AUTO=update
-JPA_SHOW_SQL=false
-SECURITY_LOG_LEVEL=INFO
-CORS_ALLOWED_ORIGINS=http://localhost:*
-RESEND_API_KEY=re_sua_chave_resend
-MAIL_FROM=Sistema de Estoque <nao-responda@seu-dominio.com>
-FRONTEND_RESET_PASSWORD_URL=http://localhost:5173/reset-password
-
-
-
 Estrutura principal:
 
 
