@@ -86,13 +86,8 @@ JPA_DDL_AUTO=update
 JPA_SHOW_SQL=false
 SECURITY_LOG_LEVEL=INFO
 CORS_ALLOWED_ORIGINS=http://localhost:*
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=seu-email@gmail.com
-MAIL_PASSWORD=sua-senha-de-app
-MAIL_SMTP_AUTH=true
-MAIL_SMTP_STARTTLS_ENABLE=true
-MAIL_FROM=seu-email@gmail.com
+RESEND_API_KEY=re_sua_chave_resend
+MAIL_FROM=Sistema de Estoque <nao-responda@seu-dominio.com>
 FRONTEND_RESET_PASSWORD_URL=http://localhost:5173/reset-password
 >>>>>>> 20f231f (adiciona cadastro de usuario)
 ```
