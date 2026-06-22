@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.matheus.estoque.category.entity.Category;
+import com.matheus.estoque.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -41,5 +43,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

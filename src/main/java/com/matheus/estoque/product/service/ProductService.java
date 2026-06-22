@@ -1,19 +1,17 @@
 package com.matheus.estoque.product.service;
 
-import com.matheus.estoque.category.repository.CategoryRepository;
-import com.matheus.estoque.product.repository.ProductRepository;
-import org.springframework.stereotype.Service;
-
 import com.matheus.estoque.category.entity.Category;
+import com.matheus.estoque.category.repository.CategoryRepository;
 import com.matheus.estoque.exception.CategoryNotFoundException;
 import com.matheus.estoque.product.dto.CreateProductDTO;
-import com.matheus.estoque.product.entity.Product;
-
 import com.matheus.estoque.product.dto.UpdateProductDTO;
-
+import com.matheus.estoque.product.entity.Product;
+import com.matheus.estoque.product.repository.ProductRepository;
+import com.matheus.estoque.security.AuthenticatedUserService;
+import com.matheus.estoque.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,18 +21,23 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public ProductService(
             ProductRepository productRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            AuthenticatedUserService authenticatedUserService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
     public Product create(CreateProductDTO dto) {
+        User user = authenticatedUserService.getCurrentUser();
 
-        Category category = categoryRepository.findById(dto.categoryId())
+        Category category = categoryRepository
+                .findByIdAndUser(dto.categoryId(), user)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Categoria não encontrada"));
 
@@ -44,6 +47,7 @@ public class ProductService {
                 .quantity(dto.quantity())
                 .minimumQuantity(dto.minimumQuantity())
                 .category(category)
+                .user(user)
                 .active(true)
                 .build();
 
@@ -51,22 +55,21 @@ public class ProductService {
     }
 
     public Page<Product> findAll(Pageable pageable) {
-        return productRepository.findByActiveTrue(pageable);
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndActiveTrue(user, pageable);
     }
 
     public Product findById(UUID id) {
-        return productRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Produto não encontrado"));
+        User user = authenticatedUserService.getCurrentUser();
+        return findOwnedProduct(id, user);
     }
 
     public Product update(UUID id, UpdateProductDTO dto) {
+        User user = authenticatedUserService.getCurrentUser();
+        Product product = findOwnedProduct(id, user);
 
-        Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Produto não encontrado"));
-
-        Category category = categoryRepository.findById(dto.categoryId())
+        Category category = categoryRepository
+                .findByIdAndUser(dto.categoryId(), user)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Categoria não encontrada"));
 
@@ -80,35 +83,52 @@ public class ProductService {
     }
 
     public void delete(UUID id) {
-
-        Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Produto não encontrado"));
+        User user = authenticatedUserService.getCurrentUser();
+        Product product = findOwnedProduct(id, user);
 
         product.setActive(false);
-
         productRepository.save(product);
     }
 
     public List<Product> findLowStock() {
-        return productRepository.findByQuantityLessThanAndActiveTrue(10);
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository
+                .findByUserAndQuantityLessThanAndActiveTrue(user, 10);
     }
 
     public List<Product> findOutOfStock() {
-        return productRepository.findByQuantityAndActiveTrue(0);
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository
+                .findByUserAndQuantityAndActiveTrue(user, 0);
     }
 
     public List<Product> searchByName(String name) {
-        return productRepository.findByNameContainingIgnoreCaseAndActiveTrue(name);
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository
+                .findByUserAndNameContainingIgnoreCaseAndActiveTrue(
+                        user,
+                        name
+                );
     }
 
     public List<Product> findByCategory(UUID categoryId) {
-        return productRepository.findByCategoryId(categoryId);
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository
+                .findByUserAndCategoryIdAndActiveTrue(user, categoryId);
     }
 
     public List<Product> findLatestProducts() {
-        return productRepository.findTop5ByActiveTrueOrderByIdDesc();
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository
+                .findTop5ByUserAndActiveTrueOrderByIdDesc(user);
     }
 
-
+    private Product findOwnedProduct(
+            UUID id,
+            User user
+    ) {
+        return productRepository.findByIdAndUserAndActiveTrue(id, user)
+                .orElseThrow(() ->
+                        new RuntimeException("Produto não encontrado"));
+    }
 }

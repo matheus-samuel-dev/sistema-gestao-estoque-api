@@ -6,6 +6,8 @@ import com.matheus.estoque.category.entity.Category;
 import com.matheus.estoque.category.repository.CategoryRepository;
 import com.matheus.estoque.exception.CategoryNotFoundException;
 import com.matheus.estoque.product.repository.ProductRepository;
+import com.matheus.estoque.security.AuthenticatedUserService;
+import com.matheus.estoque.user.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,60 +16,59 @@ import java.util.UUID;
 @Service
 public class CategoryService {
 
-    private final CategoryRepository repository;
+    private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
-    public CategoryService(CategoryRepository repository, ProductRepository productRepository) {
-        this.repository = repository;
+    public CategoryService(
+            CategoryRepository categoryRepository,
+            ProductRepository productRepository,
+            AuthenticatedUserService authenticatedUserService
+    ) {
+        this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
-    private final ProductRepository productRepository;
-
     public Category create(CreateCategoryDTO dto) {
+        User user = authenticatedUserService.getCurrentUser();
 
         Category category = Category.builder()
                 .name(dto.name())
                 .description(dto.description())
+                .user(user)
                 .build();
 
-        return repository.save(category);
+        return categoryRepository.save(category);
     }
 
     public List<Category> findAll() {
-        return repository.findAll();
+        User user = authenticatedUserService.getCurrentUser();
+        return categoryRepository.findByUserOrderByNameAsc(user);
     }
 
     public Category findById(UUID id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new CategoryNotFoundException("Categoria não encontrada")
-                );
+        User user = authenticatedUserService.getCurrentUser();
+        return findOwnedCategory(id, user);
     }
 
     public Category update(UUID id, UpdateCategoryDTO dto) {
-
-        Category category = repository.findById(id)
-                .orElseThrow(() ->
-                        new CategoryNotFoundException("Categoria não encontrada")
-                );
+        User user = authenticatedUserService.getCurrentUser();
+        Category category = findOwnedCategory(id, user);
 
         category.setName(dto.name());
         category.setDescription(dto.description());
 
-        return repository.save(category);
+        return categoryRepository.save(category);
     }
 
     public void delete(UUID id) {
-
-        Category category = repository.findById(id)
-                .orElseThrow(() ->
-                        new CategoryNotFoundException(
-                                "Categoria não encontrada"
-                        )
-                );
+        User user = authenticatedUserService.getCurrentUser();
+        Category category = findOwnedCategory(id, user);
 
         boolean hasProducts =
-                productRepository. existsByCategoryId(id);
+                productRepository
+                        .existsByCategoryIdAndUser(id, user);
 
         if (hasProducts) {
             throw new RuntimeException(
@@ -75,6 +76,15 @@ public class CategoryService {
             );
         }
 
-        repository.delete(category);
+        categoryRepository.delete(category);
+    }
+
+    private Category findOwnedCategory(
+            UUID id,
+            User user
+    ) {
+        return categoryRepository.findByIdAndUser(id, user)
+                .orElseThrow(() ->
+                        new CategoryNotFoundException("Categoria não encontrada"));
     }
 }

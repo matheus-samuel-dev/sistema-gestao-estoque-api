@@ -1,29 +1,52 @@
 package com.matheus.estoque.product.repository;
 
 import com.matheus.estoque.product.entity.Product;
+import com.matheus.estoque.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.UUID;
-
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-    List<Product> findByQuantityLessThanAndActiveTrue(Integer quantity);
+    Optional<Product> findByIdAndUserAndActiveTrue(UUID id, User user);
 
-    List<Product> findByQuantityAndActiveTrue(Integer quantity);
+    Page<Product> findByUserAndActiveTrue(
+            User user,
+            Pageable pageable
+    );
 
-    List<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name);
+    List<Product> findByUserAndActiveTrue(User user);
 
-    List<Product> findByCategoryId(UUID categoryId);
+    List<Product> findByUserAndQuantityLessThanAndActiveTrue(
+            User user,
+            Integer quantity
+    );
 
-    Page<Product> findByActiveTrue(Pageable pageable);
+    List<Product> findByUserAndQuantityAndActiveTrue(
+            User user,
+            Integer quantity
+    );
 
-    List<Product> findByActiveTrue();
+    List<Product> findByUserAndNameContainingIgnoreCaseAndActiveTrue(
+            User user,
+            String name
+    );
 
-    List<Product> findTop5ByActiveTrueOrderByIdDesc();
+    List<Product> findByUserAndCategoryIdAndActiveTrue(
+            User user,
+            UUID categoryId
+    );
 
-    boolean existsByCategoryId(UUID categoryId);
+    List<Product> findTop5ByUserAndActiveTrueOrderByIdDesc(User user);
+
+    boolean existsByCategoryIdAndUser(
+            UUID categoryId,
+            User user
+    );
+
+    long countByUserAndActiveTrue(User user);
 }

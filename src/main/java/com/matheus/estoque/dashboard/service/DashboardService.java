@@ -3,47 +3,52 @@ package com.matheus.estoque.dashboard.service;
 import com.matheus.estoque.category.repository.CategoryRepository;
 import com.matheus.estoque.dashboard.dto.CategorySummaryDTO;
 import com.matheus.estoque.dashboard.dto.DashboardResponseDTO;
+import com.matheus.estoque.dashboard.dto.MovementSummaryDTO;
 import com.matheus.estoque.product.entity.Product;
 import com.matheus.estoque.product.repository.ProductRepository;
+import com.matheus.estoque.security.AuthenticatedUserService;
 import com.matheus.estoque.stockmovement.repository.StockMovementRepository;
+import com.matheus.estoque.user.entity.User;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.matheus.estoque.dashboard.dto.MovementSummaryDTO;
-
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class DashboardService {
 
+    private static final int LOW_STOCK_LIMIT = 10;
+
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final StockMovementRepository stockMovementRepository;
-    private static final int LOW_STOCK_LIMIT = 10;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public DashboardService(
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
-            StockMovementRepository stockMovementRepository
+            StockMovementRepository stockMovementRepository,
+            AuthenticatedUserService authenticatedUserService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.stockMovementRepository = stockMovementRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
     public DashboardResponseDTO getDashboard() {
-
-        long totalProducts = productRepository.count();
-
-        long totalCategories = categoryRepository.count();
-
-        long totalMovements = stockMovementRepository.count();
-
+        User user = authenticatedUserService.getCurrentUser();
         List<Product> products =
-                productRepository.findByActiveTrue();
+                productRepository.findByUserAndActiveTrue(user);
+
+        long totalProducts =
+                productRepository.countByUserAndActiveTrue(user);
+        long totalCategories =
+                categoryRepository.countByUser(user);
+        long totalMovements =
+                stockMovementRepository.countByUser(user);
 
         int totalItemsInStock = products.stream()
                 .mapToInt(Product::getQuantity)
@@ -63,17 +68,15 @@ public class DashboardService {
         );
     }
 
-    public List<CategorySummaryDTO>
-    getProductsByCategory() {
+    public List<CategorySummaryDTO> getProductsByCategory() {
+        User user = authenticatedUserService.getCurrentUser();
 
-        return productRepository.findAll()
+        return productRepository.findByUserAndActiveTrue(user)
                 .stream()
+                .filter(product -> product.getCategory() != null)
                 .collect(
                         Collectors.groupingBy(
-                                product ->
-                                        product
-                                                .getCategory()
-                                                .getName(),
+                                product -> product.getCategory().getName(),
                                 Collectors.counting()
                         )
                 )
@@ -89,20 +92,20 @@ public class DashboardService {
     }
 
     public List<MovementSummaryDTO> getMovementsByMonth() {
+        User user = authenticatedUserService.getCurrentUser();
 
-        return stockMovementRepository.findAll()
+        return stockMovementRepository.findByUser(user)
                 .stream()
                 .filter(movement -> movement.getCreatedAt() != null)
                 .collect(
                         Collectors.groupingBy(
-                                movement ->
-                                        movement.getCreatedAt()
-                                                .getMonth()
-                                                .getDisplayName(
-                                                        TextStyle.SHORT,
-                                                        new Locale("pt", "BR")
-                                                )
-                                ,
+                                movement -> movement
+                                        .getCreatedAt()
+                                        .getMonth()
+                                        .getDisplayName(
+                                                TextStyle.SHORT,
+                                                new Locale("pt", "BR")
+                                        ),
                                 Collectors.counting()
                         )
                 )

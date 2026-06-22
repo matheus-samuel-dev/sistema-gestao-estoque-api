@@ -30,7 +30,7 @@ public class StockMovementController {
     }
 
     @Operation(summary = "Registrar movimentação de estoque")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PostMapping
     public StockMovement create(
             @Valid @RequestBody CreateStockMovementDTO dto
@@ -55,7 +55,7 @@ public class StockMovementController {
     }
 
     @Operation(summary = "Excluir movimentação")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         service.delete(id);

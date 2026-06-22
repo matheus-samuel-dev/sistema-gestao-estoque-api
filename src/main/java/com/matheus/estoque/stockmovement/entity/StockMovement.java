@@ -1,6 +1,8 @@
 package com.matheus.estoque.stockmovement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.matheus.estoque.product.entity.Product;
+import com.matheus.estoque.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,6 +34,11 @@ public class StockMovement {
 
     @Column(nullable = false)
     private String createdBy;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

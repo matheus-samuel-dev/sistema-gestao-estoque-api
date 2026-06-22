@@ -2,15 +2,15 @@ package com.matheus.estoque.stockmovement.service;
 
 import com.matheus.estoque.product.entity.Product;
 import com.matheus.estoque.product.repository.ProductRepository;
+import com.matheus.estoque.security.AuthenticatedUserService;
 import com.matheus.estoque.stockmovement.dto.CreateStockMovementDTO;
 import com.matheus.estoque.stockmovement.entity.MovementType;
 import com.matheus.estoque.stockmovement.entity.StockMovement;
 import com.matheus.estoque.stockmovement.repository.StockMovementRepository;
+import com.matheus.estoque.user.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,18 +22,24 @@ public class StockMovementService {
 
     private final StockMovementRepository stockMovementRepository;
     private final ProductRepository productRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public StockMovementService(
             StockMovementRepository stockMovementRepository,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            AuthenticatedUserService authenticatedUserService
     ) {
         this.stockMovementRepository = stockMovementRepository;
         this.productRepository = productRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
     @Transactional
     public StockMovement create(CreateStockMovementDTO dto) {
-        Product product = productRepository.findById(dto.productId())
+        User user = authenticatedUserService.getCurrentUser();
+
+        Product product = productRepository
+                .findByIdAndUserAndActiveTrue(dto.productId(), user)
                 .orElseThrow(() ->
                         new RuntimeException("Produto não encontrado"));
 
@@ -43,25 +49,8 @@ public class StockMovementService {
             );
         }
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        String userEmail =
-                authentication != null
-                        ? authentication.getName()
-                        : null;
-
-        if (userEmail == null || userEmail.isBlank()) {
-            throw new RuntimeException(
-                    "Usuário não autenticado"
-            );
-        }
-
         if (dto.type() == MovementType.EXIT &&
                 product.getQuantity() < dto.quantity()) {
-
             throw new RuntimeException(
                     "Estoque insuficiente para realizar a saída"
             );
@@ -85,35 +74,33 @@ public class StockMovementService {
                 .product(product)
                 .quantity(dto.quantity())
                 .type(dto.type())
-                .createdBy(userEmail)
+                .createdBy(user.getEmail())
+                .user(user)
                 .build();
 
         return stockMovementRepository.save(movement);
     }
 
     public Page<StockMovement> findAll(Pageable pageable) {
-        return stockMovementRepository.findAll(pageable);
+        User user = authenticatedUserService.getCurrentUser();
+        return stockMovementRepository.findByUser(user, pageable);
     }
 
     public StockMovement findById(UUID id) {
-        return stockMovementRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Movimentação não encontrada"));
+        User user = authenticatedUserService.getCurrentUser();
+        return findOwnedMovement(id, user);
     }
 
     @Transactional
     public void delete(UUID id) {
-        StockMovement movement = stockMovementRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Movimentação não encontrada"));
-
+        User user = authenticatedUserService.getCurrentUser();
+        StockMovement movement = findOwnedMovement(id, user);
         Product product = movement.getProduct();
 
         if (movement.getType() == MovementType.ENTRY &&
                 product.getQuantity() < movement.getQuantity()) {
-
             throw new RuntimeException(
-                    "Não é possível excluir a entrada: estoque atual ficaria negativo"
+                    "Não é possível excluir a entrada: o estoque atual ficaria negativo"
             );
         }
 
@@ -137,10 +124,17 @@ public class StockMovementService {
             LocalDateTime start,
             LocalDateTime end
     ) {
+        User user = authenticatedUserService.getCurrentUser();
         return stockMovementRepository
-                .findByCreatedAtBetween(
-                        start,
-                        end
-                );
+                .findByUserAndCreatedAtBetween(user, start, end);
+    }
+
+    private StockMovement findOwnedMovement(
+            UUID id,
+            User user
+    ) {
+        return stockMovementRepository.findByIdAndUser(id, user)
+                .orElseThrow(() ->
+                        new RuntimeException("Movimentação não encontrada"));
     }
 }

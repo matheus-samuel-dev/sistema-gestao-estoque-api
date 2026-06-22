@@ -36,7 +36,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Cadastrar um novo produto")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PostMapping
     public ResponseEntity<Product> create(
             @Valid @RequestBody CreateProductDTO dto
@@ -68,7 +68,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Atualizar produto")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PutMapping("/{id}")
     public Product update(
             @PathVariable UUID id,
@@ -78,7 +78,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Excluir produto")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         service.delete(id);
