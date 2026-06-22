@@ -1,75 +1,154 @@
-
 <div align="center">
 
-# 🚀 Sistema de Gestão de Estoque - Backend
+# 🚀 Sistema de Gestão de Estoque
 
-API REST desenvolvida com Java e Spring Boot para gerenciamento de estoque, autenticação de usuários e persistência de dados em PostgreSQL.
+Sistema web completo para gerenciamento de estoque desenvolvido com **Java Spring Boot**, **React** e **PostgreSQL**.
+
+O objetivo do projeto é permitir o controle de produtos, categorias e movimentações de estoque em tempo real, utilizando autenticação segura, dashboard analítico e persistência em banco de dados em nuvem.
 
 <br>
-
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge\&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=for-the-badge\&logo=springboot)
 ![Spring Security](https://img.shields.io/badge/Spring_Security-Authentication-6DB33F?style=for-the-badge\&logo=springsecurity)
 ![JWT](https://img.shields.io/badge/JWT-Security-black?style=for-the-badge\&logo=jsonwebtokens)
-![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-Persistence-6DB33F?style=for-the-badge)
-![Hibernate](https://img.shields.io/badge/Hibernate-ORM-59666C?style=for-the-badge\&logo=hibernate)
+![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge\&logo=react)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge\&logo=postgresql)
 ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge\&logo=swagger)
-![Maven](https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge\&logo=apachemaven)
-![Railway](https://img.shields.io/badge/Railway-Deploy-0B0D0E?style=for-the-badge\&logo=railway)
+![Railway](https://img.shields.io/badge/Railway-Backend-0B0D0E?style=for-the-badge\&logo=railway)
+![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge\&logo=vercel)
 
 </div>
 
 ---
 
-## 📖 Sobre o Projeto
+# 📑 Índice
 
-Esta API REST foi desenvolvida para fornecer toda a camada de negócio do Sistema de Gestão de Estoque.
-
-A aplicação é responsável pela autenticação de usuários, controle de acesso, gerenciamento de produtos e categorias, além da persistência dos dados em banco PostgreSQL hospedado em nuvem.
-
-O projeto foi construído utilizando boas práticas de desenvolvimento com Spring Boot, arquitetura em camadas e autenticação baseada em JWT.
+* 🌐 Aplicação Online
+* ⭐ Destaques Técnicos
+* 📸 Preview
+* ✨ Funcionalidades
+* 🏗 Arquitetura
+* 🔐 Segurança
+* 🛠 Tecnologias Utilizadas
+* ⚙️ Executando Localmente
+* 🚀 Próximas Evoluções
+* 👨‍💻 Autor
 
 ---
 
-## ✨ Funcionalidades
+# 🌐 Aplicação Online
 
-### Autenticação
+### 🔗 Sistema em Produção
+
+https://sistema-gestao-estoque-two.vercel.app
+
+### 💻 Repositórios
+
+**Frontend**
+
+https://github.com/matheus-samuel-dev/sistema-gestao-estoque
+
+**Backend**
+
+https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api
+
+---
+
+# ⭐ Destaques Técnicos
+
+✅ Autenticação JWT
+
+✅ Recuperação de senha
+
+✅ Criptografia de senhas com BCrypt
+
+✅ Dashboard com indicadores e gráficos
+
+✅ Controle de produtos e categorias
+
+✅ Registro de entradas e saídas de estoque
+
+✅ Exportação PDF e Excel
+
+✅ API REST documentada com Swagger
+
+✅ Deploy completo (Railway + Vercel)
+
+✅ Interface responsiva para desktop e dispositivos móveis
+
+---
+
+# 📸 Preview
+
+## 🔐 Login
+
+![Login](./docs/login.png)
+
+## 📊 Dashboard
+
+![Dashboard](./docs/dashboard.png)
+
+## 📈 Movimentações
+
+![Movimentações](./docs/movimentacoes.png)
+
+## 📦 Produtos
+
+![Produtos](./docs/produtos.png)
+
+---
+
+# ✨ Funcionalidades
+
+## 🔐 Autenticação
 
 * Cadastro de usuários
 * Login com JWT
+* Recuperação de senha
 * Criptografia de senhas com BCrypt
 * Rotas protegidas com Spring Security
 
-### Produtos
+## 📦 Gestão de Produtos
 
 * Cadastro de produtos
 * Atualização de produtos
 * Exclusão de produtos
-* Listagem de produtos
+* Consulta de produtos
+* Controle de estoque
 
-### Categorias
+## 🏷 Gestão de Categorias
 
 * Cadastro de categorias
 * Atualização de categorias
 * Exclusão de categorias
-* Listagem de categorias
+* Organização dos produtos por categoria
 
-### Infraestrutura
+## 📊 Movimentações de Estoque
 
-* Integração com PostgreSQL
-* Persistência com JPA/Hibernate
-* Documentação via Swagger
-* Deploy em ambiente cloud
+* Registro de entradas
+* Registro de saídas
+* Histórico de movimentações
+* Atualização automática do estoque
+* Controle de usuários responsáveis
+
+## 📈 Dashboard Analítico
+
+* Quantidade de produtos cadastrados
+* Categorias ativas
+* Produtos sem estoque
+* Produtos com estoque baixo
+* Gráfico de entradas e saídas
+* Distribuição de produtos por categoria
+* Últimas movimentações realizadas
 
 ---
 
-## 🏗 Arquitetura
+# 🏗 Arquitetura
 
-A aplicação segue uma arquitetura em camadas para garantir organização, manutenção e escalabilidade.
+O backend segue arquitetura em camadas para garantir organização, manutenção e escalabilidade.
 
-
+```text
 Controller
     ↓
 Service
@@ -77,33 +156,33 @@ Service
 Repository
     ↓
 PostgreSQL
-=======
+```
 
-Estrutura principal:
+### Estrutura principal
 
-
+```text
 src
 ├── config
 ├── security
-├── auth
 ├── user
 ├── product
 ├── category
+├── stockmovement
 ├── dto
 ├── repository
 ├── service
 └── exception
-
+```
 
 ---
 
-## 🔐 Segurança
+# 🔐 Segurança
 
-A autenticação da aplicação é baseada em JWT (JSON Web Token).
+A autenticação da aplicação utiliza JWT (JSON Web Token).
 
-Fluxo de autenticação:
+### Fluxo de autenticação
 
-
+```text
 Usuário
     ↓
 Login
@@ -111,21 +190,22 @@ Login
 JWT
     ↓
 Requisições Autenticadas
+```
 
-
-Recursos implementados:
+### Recursos implementados
 
 * Spring Security
 * JWT Authentication
-* Password Encoder (BCrypt)
+* BCrypt Password Encoder
 * Filtros de autenticação
 * Rotas públicas e protegidas
+* Controle de acesso baseado em autenticação
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+# 🛠 Tecnologias Utilizadas
 
-### Backend
+## Backend
 
 * Java 21
 * Spring Boot
@@ -135,84 +215,76 @@ Recursos implementados:
 * Hibernate
 * Maven
 
-### Banco de Dados
+## Frontend
+
+* React
+* Vite
+* Material UI
+* Axios
+* React Router
+
+## Banco de Dados
 
 * PostgreSQL
 
-### Documentação
+## Deploy
+
+* Railway
+* Vercel
+
+## Documentação
 
 * Swagger / OpenAPI
 
-### Deploy
-
-* Railway
-
 ---
 
-## 📂 Integração com Frontend
+# ⚙️ Executando Localmente
 
-Frontend da aplicação:
-
-https://github.com/matheus-samuel-dev/sistema-gestao-estoque
-
-Aplicação online:
-
-https://sistema-gestao-estoque-two.vercel.app
-
----
-
-## ⚙️ Executando Localmente
-
-
+```bash
 git clone https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api.git
 
 cd sistema-gestao-estoque-api
 
 mvn spring-boot:run
+```
 
+Backend disponível em:
 
-A aplicação será iniciada em:
-
-
+```text
 http://localhost:8080
-
+```
 
 ---
 
-## 🔮 Melhorias Futuras
+# 🚀 Próximas Evoluções
 
-* [ ] Controle de permissões por perfis (ADMIN, USER)
-* [ ] Refresh Token
+* [ ] Controle de permissões ADMIN e USER
+* [ ] Multiusuário com isolamento de dados
+* [ ] Docker
 * [ ] Testes unitários com JUnit
 * [ ] Testes de integração
-* [ ] Dockerização da aplicação
 * [ ] Pipeline CI/CD
-* [ ] Logs centralizados
-* [ ] Monitoramento e métricas
-* [ ] Auditoria de movimentações
 * [ ] Cache com Redis
-* [ ] Versionamento da API
+* [ ] Logs centralizados
+* [ ] Auditoria de movimentações
+* [ ] Monitoramento e métricas
+* [ ] Versionamento de API
+* [ ] Exportação avançada de relatórios
 
 ---
 
-## 🌐 Contato
+# 👨‍💻 Autor
 
-### Portfólio
+## Matheus Samuel Baena Soares
+
+Desenvolvedor de Software com foco em Java, Spring Boot e desenvolvimento de aplicações web.
+
+🌐 Portfólio
 
 https://matheus-samuel-dev.github.io/Portfolio/
 
-### LinkedIn
+💼 LinkedIn
 
 https://www.linkedin.com/in/matheus-samuel-dev/
-
----
-
-## 👨‍💻 Autor
-
-**Matheus Samuel Baena Soares**
-
-Desenvolvedor Full Stack em formação, com foco em Java, Spring Boot e desenvolvimento de aplicações web.
-
----
 
 ⭐ Se gostou do projeto, considere deixar uma estrela no repositório.
