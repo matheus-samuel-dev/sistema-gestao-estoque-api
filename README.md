@@ -7,7 +7,7 @@ API REST desenvolvida com Java e Spring Boot para gerenciamento de estoque, aute
 
 <br>
 
-<<<<<<< HEAD
+
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge\&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=for-the-badge\&logo=springboot)
 ![Spring Security](https://img.shields.io/badge/Spring_Security-Authentication-6DB33F?style=for-the-badge\&logo=springsecurity)
@@ -69,7 +69,7 @@ O projeto foi construído utilizando boas práticas de desenvolvimento com Sprin
 
 A aplicação segue uma arquitetura em camadas para garantir organização, manutenção e escalabilidade.
 
-```text id="4e6zgh"
+
 Controller
     ↓
 Service
@@ -78,7 +78,7 @@ Repository
     ↓
 PostgreSQL
 =======
-```env
+
 DATABASE_URL=jdbc:postgresql://localhost:5432/stock_management
 DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=postgres
@@ -89,12 +89,12 @@ CORS_ALLOWED_ORIGINS=http://localhost:*
 RESEND_API_KEY=re_sua_chave_resend
 MAIL_FROM=Sistema de Estoque <nao-responda@seu-dominio.com>
 FRONTEND_RESET_PASSWORD_URL=http://localhost:5173/reset-password
->>>>>>> 20f231f (adiciona cadastro de usuario)
-```
+
+
 
 Estrutura principal:
 
-```text id="cww3eh"
+
 src
 ├── config
 ├── security
@@ -106,7 +106,7 @@ src
 ├── repository
 ├── service
 └── exception
-```
+
 
 ---
 
@@ -116,7 +116,7 @@ A autenticação da aplicação é baseada em JWT (JSON Web Token).
 
 Fluxo de autenticação:
 
-```text id="mif48g"
+
 Usuário
     ↓
 Login
@@ -124,7 +124,7 @@ Login
 JWT
     ↓
 Requisições Autenticadas
-```
+
 
 Recursos implementados:
 
@@ -176,19 +176,19 @@ https://sistema-gestao-estoque-two.vercel.app
 
 ## ⚙️ Executando Localmente
 
-```bash
+
 git clone https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api.git
 
 cd sistema-gestao-estoque-api
 
 mvn spring-boot:run
-```
+
 
 A aplicação será iniciada em:
 
-```text
+
 http://localhost:8080
-```
+
 
 ---
 
