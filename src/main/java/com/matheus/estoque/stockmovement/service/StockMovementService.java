@@ -1,6 +1,7 @@
 package com.matheus.estoque.stockmovement.service;
 
 import com.matheus.estoque.product.entity.Product;
+import com.matheus.estoque.product.entity.InventoryOrigin;
 import com.matheus.estoque.product.repository.ProductRepository;
 import com.matheus.estoque.security.AuthenticatedUserService;
 import com.matheus.estoque.stockmovement.dto.CreateStockMovementDTO;
@@ -74,6 +75,8 @@ public class StockMovementService {
                 .product(product)
                 .quantity(dto.quantity())
                 .type(dto.type())
+                .origin(dto.origin() == null ? InventoryOrigin.OTHER : dto.origin())
+                .notes(dto.notes() == null || dto.notes().isBlank() ? null : dto.notes().trim())
                 .createdBy(user.getEmail())
                 .user(user)
                 .build();

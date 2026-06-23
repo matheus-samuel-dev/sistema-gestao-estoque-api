@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import com.matheus.estoque.product.entity.InventoryOrigin;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProductService {
@@ -35,23 +37,28 @@ public class ProductService {
 
     public Product create(CreateProductDTO dto) {
         User user = authenticatedUserService.getCurrentUser();
+        validateIdentifiers(user, dto.internalCode(), dto.sku(), dto.barcode(), null);
 
         Category category = categoryRepository
                 .findByIdAndUser(dto.categoryId(), user)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Categoria não encontrada"));
 
-        Product product = Product.builder()
-                .name(dto.name())
-                .price(dto.price())
-                .quantity(dto.quantity())
-                .minimumQuantity(dto.minimumQuantity())
-                .category(category)
-                .user(user)
-                .active(true)
-                .build();
+        if (!Boolean.TRUE.equals(category.getActive())) {
+            throw new RuntimeException("Categoria inativa. Selecione uma categoria ativa.");
+        }
+
+        Product product = apply(Product.builder().user(user).active(true).build(), dto, category);
 
         return productRepository.save(product);
+    }
+
+    @Transactional
+    public List<Product> createBatch(List<CreateProductDTO> items) {
+        if (items.size() > 500) {
+            throw new RuntimeException("A importação permite no máximo 500 produtos por vez.");
+        }
+        return items.stream().map(this::create).toList();
     }
 
     public Page<Product> findAll(Pageable pageable) {
@@ -67,19 +74,80 @@ public class ProductService {
     public Product update(UUID id, UpdateProductDTO dto) {
         User user = authenticatedUserService.getCurrentUser();
         Product product = findOwnedProduct(id, user);
+        validateIdentifiers(user, dto.internalCode(), dto.sku(), dto.barcode(), id);
 
         Category category = categoryRepository
                 .findByIdAndUser(dto.categoryId(), user)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Categoria não encontrada"));
 
-        product.setName(dto.name());
+        if (!Boolean.TRUE.equals(category.getActive())) {
+            throw new RuntimeException("Categoria inativa. Selecione uma categoria ativa.");
+        }
+
+        apply(product, dto, category);
+
+        return productRepository.save(product);
+    }
+
+    private Product apply(Product product, CreateProductDTO dto, Category category) {
+        product.setName(dto.name().trim());
+        product.setInternalCode(blankToNull(dto.internalCode()));
+        product.setSku(blankToNull(dto.sku()));
+        product.setBarcode(blankToNull(dto.barcode()));
+        product.setSerialNumber(blankToNull(dto.serialNumber()));
+        product.setDescription(blankToNull(dto.description()));
+        product.setBrand(blankToNull(dto.brand()));
+        product.setModel(blankToNull(dto.model()));
+        product.setPhysicalLocation(blankToNull(dto.physicalLocation()));
         product.setPrice(dto.price());
         product.setQuantity(dto.quantity());
         product.setMinimumQuantity(dto.minimumQuantity());
         product.setCategory(category);
+        product.setOrigin(dto.origin() == null ? InventoryOrigin.OTHER : dto.origin());
+        product.setNotes(blankToNull(dto.notes()));
+        return product;
+    }
 
-        return productRepository.save(product);
+    private Product apply(Product product, UpdateProductDTO dto, Category category) {
+        product.setName(dto.name().trim());
+        product.setInternalCode(blankToNull(dto.internalCode()));
+        product.setSku(blankToNull(dto.sku()));
+        product.setBarcode(blankToNull(dto.barcode()));
+        product.setSerialNumber(blankToNull(dto.serialNumber()));
+        product.setDescription(blankToNull(dto.description()));
+        product.setBrand(blankToNull(dto.brand()));
+        product.setModel(blankToNull(dto.model()));
+        product.setPhysicalLocation(blankToNull(dto.physicalLocation()));
+        product.setPrice(dto.price());
+        product.setQuantity(dto.quantity());
+        product.setMinimumQuantity(dto.minimumQuantity());
+        product.setCategory(category);
+        product.setOrigin(dto.origin() == null ? InventoryOrigin.OTHER : dto.origin());
+        product.setNotes(blankToNull(dto.notes()));
+        return product;
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private void validateIdentifiers(User user, String internalCode, String sku, String barcode, UUID ignoredId) {
+        String code = blankToNull(internalCode);
+        String normalizedSku = blankToNull(sku);
+        String normalizedBarcode = blankToNull(barcode);
+        boolean duplicateCode = code != null && (ignoredId == null
+                ? productRepository.existsByUserAndInternalCodeIgnoreCaseAndActiveTrue(user, code)
+                : productRepository.existsByUserAndInternalCodeIgnoreCaseAndIdNotAndActiveTrue(user, code, ignoredId));
+        boolean duplicateSku = normalizedSku != null && (ignoredId == null
+                ? productRepository.existsByUserAndSkuIgnoreCaseAndActiveTrue(user, normalizedSku)
+                : productRepository.existsByUserAndSkuIgnoreCaseAndIdNotAndActiveTrue(user, normalizedSku, ignoredId));
+        boolean duplicateBarcode = normalizedBarcode != null && (ignoredId == null
+                ? productRepository.existsByUserAndBarcodeAndActiveTrue(user, normalizedBarcode)
+                : productRepository.existsByUserAndBarcodeAndIdNotAndActiveTrue(user, normalizedBarcode, ignoredId));
+        if (duplicateCode) throw new RuntimeException("Código interno já utilizado por outro produto.");
+        if (duplicateSku) throw new RuntimeException("SKU já utilizado por outro produto.");
+        if (duplicateBarcode) throw new RuntimeException("Código de barras já utilizado por outro produto.");
     }
 
     public void delete(UUID id) {

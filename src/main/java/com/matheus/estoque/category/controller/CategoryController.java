@@ -31,6 +31,15 @@ public class CategoryController {
         this.service = service;
     }
 
+    @Operation(summary = "Ativar ou desativar categoria")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Category> setActive(
+            @PathVariable UUID id,
+            @RequestParam boolean active
+    ) {
+        return ResponseEntity.ok(service.setActive(id, active));
+    }
+
     @Operation(summary = "Cadastrar categoria")
     @PostMapping
     public ResponseEntity<Category> create(

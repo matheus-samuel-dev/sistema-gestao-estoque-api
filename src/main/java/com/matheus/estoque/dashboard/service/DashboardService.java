@@ -15,6 +15,7 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.math.BigDecimal;
 
 @Service
 public class DashboardService {
@@ -46,7 +47,7 @@ public class DashboardService {
         long totalProducts =
                 productRepository.countByUserAndActiveTrue(user);
         long totalCategories =
-                categoryRepository.countByUser(user);
+                categoryRepository.countByUserAndActiveTrue(user);
         long totalMovements =
                 stockMovementRepository.countByUser(user);
 
@@ -56,15 +57,25 @@ public class DashboardService {
 
         long lowStockProducts = products.stream()
                 .filter(product ->
-                        product.getQuantity() < LOW_STOCK_LIMIT)
+                        product.getQuantity() <= product.getMinimumQuantity())
                 .count();
+
+        long outOfStockProducts = products.stream()
+                .filter(product -> product.getQuantity() == 0)
+                .count();
+
+        BigDecimal totalStockValue = products.stream()
+                .map(product -> product.getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new DashboardResponseDTO(
                 totalProducts,
                 totalCategories,
                 totalMovements,
                 totalItemsInStock,
-                lowStockProducts
+                lowStockProducts,
+                outOfStockProducts,
+                totalStockValue
         );
     }
 

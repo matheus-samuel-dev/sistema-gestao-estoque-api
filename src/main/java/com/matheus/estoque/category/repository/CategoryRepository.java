@@ -14,5 +14,11 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
 
     List<Category> findByUserOrderByNameAsc(User user);
 
+    List<Category> findByUserAndActiveTrueOrderByNameAsc(User user);
+
+    boolean existsByUserAndNameIgnoreCase(User user, String name);
+
     long countByUser(User user);
+
+    long countByUserAndActiveTrue(User user);
 }

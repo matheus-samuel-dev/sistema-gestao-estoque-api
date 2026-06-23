@@ -2,6 +2,7 @@ package com.matheus.estoque.stockmovement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.matheus.estoque.product.entity.Product;
+import com.matheus.estoque.product.entity.InventoryOrigin;
 import com.matheus.estoque.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,6 +32,14 @@ public class StockMovement {
 
     @Enumerated(EnumType.STRING)
     private MovementType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 40)
+    @Builder.Default
+    private InventoryOrigin origin = InventoryOrigin.OTHER;
+
+    @Column(length = 2000)
+    private String notes;
 
     @Column(nullable = false)
     private String createdBy;

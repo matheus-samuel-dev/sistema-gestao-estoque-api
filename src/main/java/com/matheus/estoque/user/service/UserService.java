@@ -7,6 +7,8 @@ import com.matheus.estoque.user.dto.RegisterDTO;
 import com.matheus.estoque.user.entity.Role;
 import com.matheus.estoque.user.entity.User;
 import com.matheus.estoque.user.repository.UserRepository;
+import com.matheus.estoque.category.entity.Category;
+import com.matheus.estoque.category.repository.CategoryRepository;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,6 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -27,20 +30,31 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
+    private final CategoryRepository categoryRepository;
+
+    private static final List<String> DEFAULT_CATEGORIES = List.of(
+            "Informática", "Periféricos", "Material de Escritório", "Equipamentos",
+            "Ferramentas", "Limpeza", "Elétrica", "Móveis", "Outros"
+    );
 
     public UserService(
             UserRepository repository,
             BCryptPasswordEncoder encoder,
             JwtService jwtService,
-            RestTemplate restTemplate
+            RestTemplate restTemplate,
+            CategoryRepository categoryRepository
     ) {
         this.repository = repository;
         this.encoder = encoder;
         this.jwtService = jwtService;
         this.restTemplate = restTemplate;
+        this.categoryRepository = categoryRepository;
     }
 
     public User register(RegisterDTO dto) {
+        if (repository.findByEmail(dto.email().trim().toLowerCase()).isPresent()) {
+            throw new RuntimeException("Já existe uma conta cadastrada com este e-mail.");
+        }
         Role role =
                 "ADMIN".equalsIgnoreCase(dto.role())
                         ? Role.ADMIN
@@ -48,14 +62,16 @@ public class UserService {
 
         User user = User.builder()
                 .name(dto.name())
-                .email(dto.email())
+                .email(dto.email().trim().toLowerCase())
                 .password(
                         encoder.encode(dto.password())
                 )
                 .role(role)
                 .build();
 
-        return repository.save(user);
+        User saved = repository.save(user);
+        createDefaultCategories(saved);
+        return saved;
     }
 
     public AuthResponseDTO login(LoginDTO dto) {
@@ -129,7 +145,9 @@ public class UserService {
                                             .role(Role.USER)
                                             .build();
 
-                            return repository.save(novoUsuario);
+                            User saved = repository.save(novoUsuario);
+                            createDefaultCategories(saved);
+                            return saved;
                         });
 
         String token =
@@ -138,6 +156,19 @@ public class UserService {
                 );
 
         return new AuthResponseDTO(token);
+    }
+
+    private void createDefaultCategories(User user) {
+        DEFAULT_CATEGORIES.forEach(name -> {
+            if (!categoryRepository.existsByUserAndNameIgnoreCase(user, name)) {
+                categoryRepository.save(Category.builder()
+                        .name(name)
+                        .description("Categoria padrão")
+                        .active(true)
+                        .user(user)
+                        .build());
+            }
+        });
     }
 
     private Map<String, Object> loadGoogleUser(String googleToken) {

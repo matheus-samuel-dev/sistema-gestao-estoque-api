@@ -37,8 +37,16 @@ public class CategoryService {
                 .name(dto.name())
                 .description(dto.description())
                 .user(user)
+                .active(true)
                 .build();
 
+        return categoryRepository.save(category);
+    }
+
+    public Category setActive(UUID id, boolean active) {
+        User user = authenticatedUserService.getCurrentUser();
+        Category category = findOwnedCategory(id, user);
+        category.setActive(active);
         return categoryRepository.save(category);
     }
 

@@ -26,10 +26,14 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column
     private String name;
 
     private String description;
+
+    @Column
+    @Builder.Default
+    private Boolean active = true;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

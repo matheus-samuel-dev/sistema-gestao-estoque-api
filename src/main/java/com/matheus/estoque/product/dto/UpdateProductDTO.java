@@ -1,36 +1,30 @@
 package com.matheus.estoque.product.dto;
 
+import com.matheus.estoque.product.entity.InventoryOrigin;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public record UpdateProductDTO(
-
-
-        @NotBlank(message = "O nome não pode estar vazio")
-
-        @NotBlank(message = "O nome não pode estar vazio")
-        @Pattern(
-                regexp = "^[A-Za-zÀ-ÿ0-9\\s]+$",
-                message = "Nome inválido"
-        )
-        String name,
-
-        @Positive(message = "O preço deve ser maior que zero")
-        BigDecimal price,
-
-        @Positive(message = "A quantidade deve ser maior que zero")
-        Integer quantity,
-
-        @Positive(message = "O estoque mínimo deve ser maior que zero")
-        Integer minimumQuantity,
-
-        @NotNull(message = "A categoria é obrigatória")
-        UUID categoryId
-
-) {
-}
+        @NotBlank(message = "Nome é obrigatório") @Size(max = 180) String name,
+        @Size(max = 80) String internalCode,
+        @Size(max = 80) String sku,
+        @Size(max = 120) String barcode,
+        @Size(max = 120) String serialNumber,
+        @Size(max = 2000) String description,
+        @Size(max = 120) String brand,
+        @Size(max = 120) String model,
+        @Size(max = 180) String physicalLocation,
+        @NotNull(message = "Valor unitário é obrigatório")
+        @DecimalMin(value = "0.0", inclusive = true, message = "Valor inválido") BigDecimal price,
+        @NotNull(message = "Quantidade é obrigatória") @Min(value = 0) Integer quantity,
+        @NotNull(message = "Estoque mínimo é obrigatório") @Min(value = 0) Integer minimumQuantity,
+        @NotNull(message = "Categoria é obrigatória") UUID categoryId,
+        InventoryOrigin origin,
+        @Size(max = 2000) String notes
+) {}

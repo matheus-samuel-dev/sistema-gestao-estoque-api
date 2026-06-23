@@ -1,6 +1,7 @@
 package com.matheus.estoque.stockmovement.dto;
 
 import com.matheus.estoque.stockmovement.entity.MovementType;
+import com.matheus.estoque.product.entity.InventoryOrigin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,6 +16,10 @@ public record CreateStockMovementDTO(
         Integer quantity,
 
         @NotNull(message = "Tipo da movimentação é obrigatório")
-        MovementType type
+        MovementType type,
+
+        InventoryOrigin origin,
+
+        String notes
 ) {
 }

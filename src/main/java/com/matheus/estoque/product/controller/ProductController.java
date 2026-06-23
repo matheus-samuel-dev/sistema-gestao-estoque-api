@@ -35,6 +35,15 @@ public class ProductController {
         this.service = service;
     }
 
+    @Operation(summary = "Importar produtos validados em lote")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PostMapping("/import")
+    public ResponseEntity<List<Product>> importProducts(
+            @RequestBody List<@Valid CreateProductDTO> items
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createBatch(items));
+    }
+
     @Operation(summary = "Cadastrar um novo produto")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PostMapping

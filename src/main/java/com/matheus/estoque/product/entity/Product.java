@@ -27,8 +27,40 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "internal_code", length = 80)
+    private String internalCode;
+
+    @Column(length = 80)
+    private String sku;
+
+    @Column(name = "barcode", length = 120)
+    private String barcode;
+
+    @Column(name = "serial_number", length = 120)
+    private String serialNumber;
+
+    @Column(length = 2000)
+    private String description;
+
+    @Column(length = 120)
+    private String brand;
+
+    @Column(length = 120)
+    private String model;
+
+    @Column(name = "physical_location", length = 180)
+    private String physicalLocation;
+
     @Column(nullable = false)
     private BigDecimal price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 40)
+    @Builder.Default
+    private InventoryOrigin origin = InventoryOrigin.OTHER;
+
+    @Column(length = 2000)
+    private String notes;
 
     @Column(nullable = false)
     private Integer quantity;
