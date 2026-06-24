@@ -119,6 +119,14 @@ public class ProductController {
         return service.findByCategory(categoryId);
     }
 
+    @Operation(summary = "Buscar produtos por fornecedor")
+    @GetMapping("/supplier/{supplierId}")
+    public List<Product> findBySupplier(
+            @PathVariable UUID supplierId
+    ) {
+        return service.findBySupplier(supplierId);
+    }
+
     @GetMapping("/latest")
     public List<Product> findLatestProducts() {
         return service.findLatestProducts();

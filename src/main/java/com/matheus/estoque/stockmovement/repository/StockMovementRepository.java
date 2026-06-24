@@ -1,6 +1,7 @@
 package com.matheus.estoque.stockmovement.repository;
 
 import com.matheus.estoque.stockmovement.entity.StockMovement;
+import com.matheus.estoque.stockmovement.entity.MovementType;
 import com.matheus.estoque.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,4 +31,11 @@ public interface StockMovementRepository
     );
 
     long countByUser(User user);
+
+    long countByUserAndTypeAndCreatedAtBetween(
+            User user,
+            MovementType type,
+            LocalDateTime start,
+            LocalDateTime end
+    );
 }

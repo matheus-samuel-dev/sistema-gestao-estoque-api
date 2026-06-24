@@ -8,6 +8,8 @@ import com.matheus.estoque.product.dto.UpdateProductDTO;
 import com.matheus.estoque.product.entity.Product;
 import com.matheus.estoque.product.repository.ProductRepository;
 import com.matheus.estoque.security.AuthenticatedUserService;
+import com.matheus.estoque.supplier.entity.Supplier;
+import com.matheus.estoque.supplier.repository.SupplierRepository;
 import com.matheus.estoque.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,21 +25,25 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final SupplierRepository supplierRepository;
     private final AuthenticatedUserService authenticatedUserService;
 
     public ProductService(
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
+            SupplierRepository supplierRepository,
             AuthenticatedUserService authenticatedUserService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.supplierRepository = supplierRepository;
         this.authenticatedUserService = authenticatedUserService;
     }
 
     public Product create(CreateProductDTO dto) {
         User user = authenticatedUserService.getCurrentUser();
-        validateIdentifiers(user, dto.internalCode(), dto.sku(), dto.barcode(), null);
+        String internalCode = blankToNull(dto.internalCode()) == null ? generateInternalCode(user) : dto.internalCode();
+        validateIdentifiers(user, internalCode, dto.sku(), dto.barcode(), null);
 
         Category category = categoryRepository
                 .findByIdAndUser(dto.categoryId(), user)
@@ -48,7 +54,8 @@ public class ProductService {
             throw new RuntimeException("Categoria inativa. Selecione uma categoria ativa.");
         }
 
-        Product product = apply(Product.builder().user(user).active(true).build(), dto, category);
+        Supplier supplier = resolveSupplier(dto.supplierId(), user);
+        Product product = apply(Product.builder().user(user).active(true).build(), dto, category, supplier, internalCode);
 
         return productRepository.save(product);
     }
@@ -74,7 +81,11 @@ public class ProductService {
     public Product update(UUID id, UpdateProductDTO dto) {
         User user = authenticatedUserService.getCurrentUser();
         Product product = findOwnedProduct(id, user);
-        validateIdentifiers(user, dto.internalCode(), dto.sku(), dto.barcode(), id);
+        String internalCode = blankToNull(dto.internalCode()) == null ? product.getInternalCode() : dto.internalCode();
+        if (blankToNull(internalCode) == null) {
+            internalCode = generateInternalCode(user);
+        }
+        validateIdentifiers(user, internalCode, dto.sku(), dto.barcode(), id);
 
         Category category = categoryRepository
                 .findByIdAndUser(dto.categoryId(), user)
@@ -85,14 +96,15 @@ public class ProductService {
             throw new RuntimeException("Categoria inativa. Selecione uma categoria ativa.");
         }
 
-        apply(product, dto, category);
+        Supplier supplier = resolveSupplier(dto.supplierId(), user);
+        apply(product, dto, category, supplier, internalCode);
 
         return productRepository.save(product);
     }
 
-    private Product apply(Product product, CreateProductDTO dto, Category category) {
+    private Product apply(Product product, CreateProductDTO dto, Category category, Supplier supplier, String internalCode) {
         product.setName(dto.name().trim());
-        product.setInternalCode(blankToNull(dto.internalCode()));
+        product.setInternalCode(blankToNull(internalCode));
         product.setSku(blankToNull(dto.sku()));
         product.setBarcode(blankToNull(dto.barcode()));
         product.setSerialNumber(blankToNull(dto.serialNumber()));
@@ -104,14 +116,15 @@ public class ProductService {
         product.setQuantity(dto.quantity());
         product.setMinimumQuantity(dto.minimumQuantity());
         product.setCategory(category);
-        product.setOrigin(dto.origin() == null ? InventoryOrigin.OTHER : dto.origin());
+        product.setSupplier(supplier);
+        product.setOrigin(dto.origin() == null ? InventoryOrigin.OUTRO : dto.origin());
         product.setNotes(blankToNull(dto.notes()));
         return product;
     }
 
-    private Product apply(Product product, UpdateProductDTO dto, Category category) {
+    private Product apply(Product product, UpdateProductDTO dto, Category category, Supplier supplier, String internalCode) {
         product.setName(dto.name().trim());
-        product.setInternalCode(blankToNull(dto.internalCode()));
+        product.setInternalCode(blankToNull(internalCode));
         product.setSku(blankToNull(dto.sku()));
         product.setBarcode(blankToNull(dto.barcode()));
         product.setSerialNumber(blankToNull(dto.serialNumber()));
@@ -123,13 +136,35 @@ public class ProductService {
         product.setQuantity(dto.quantity());
         product.setMinimumQuantity(dto.minimumQuantity());
         product.setCategory(category);
-        product.setOrigin(dto.origin() == null ? InventoryOrigin.OTHER : dto.origin());
+        product.setSupplier(supplier);
+        product.setOrigin(dto.origin() == null ? InventoryOrigin.OUTRO : dto.origin());
         product.setNotes(blankToNull(dto.notes()));
         return product;
     }
 
     private String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private Supplier resolveSupplier(UUID supplierId, User user) {
+        if (supplierId == null) {
+            return null;
+        }
+        Supplier supplier = supplierRepository.findByIdAndUser(supplierId, user)
+                .orElseThrow(() -> new RuntimeException("Fornecedor não encontrado"));
+        if (!Boolean.TRUE.equals(supplier.getActive())) {
+            throw new RuntimeException("Fornecedor inativo. Selecione um fornecedor ativo.");
+        }
+        return supplier;
+    }
+
+    private String generateInternalCode(User user) {
+        int next = (int) productRepository.countByUserAndActiveTrue(user) + 1;
+        String code;
+        do {
+            code = "PRD-" + String.format("%03d", next++);
+        } while (productRepository.existsByUserAndInternalCodeIgnoreCase(user, code));
+        return code;
     }
 
     private void validateIdentifiers(User user, String internalCode, String sku, String barcode, UUID ignoredId) {
@@ -183,6 +218,12 @@ public class ProductService {
         User user = authenticatedUserService.getCurrentUser();
         return productRepository
                 .findByUserAndCategoryIdAndActiveTrue(user, categoryId);
+    }
+
+    public List<Product> findBySupplier(UUID supplierId) {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository
+                .findByUserAndSupplierIdAndActiveTrue(user, supplierId);
     }
 
     public List<Product> findLatestProducts() {

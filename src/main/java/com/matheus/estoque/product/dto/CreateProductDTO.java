@@ -32,6 +32,7 @@ public record CreateProductDTO(
         @Min(value = 0, message = "Estoque mínimo não pode ser negativo")
         Integer minimumQuantity,
         @NotNull(message = "Categoria é obrigatória") UUID categoryId,
+        UUID supplierId,
         InventoryOrigin origin,
         @Size(max = 2000) String notes
 ) {}

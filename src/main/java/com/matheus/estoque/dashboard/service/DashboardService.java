@@ -7,10 +7,13 @@ import com.matheus.estoque.dashboard.dto.MovementSummaryDTO;
 import com.matheus.estoque.product.entity.Product;
 import com.matheus.estoque.product.repository.ProductRepository;
 import com.matheus.estoque.security.AuthenticatedUserService;
+import com.matheus.estoque.stockmovement.entity.MovementType;
 import com.matheus.estoque.stockmovement.repository.StockMovementRepository;
 import com.matheus.estoque.user.entity.User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -68,6 +71,16 @@ public class DashboardService {
                 .map(product -> product.getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        YearMonth currentMonth = YearMonth.now();
+        LocalDateTime monthStart = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime monthEnd = currentMonth.plusMonths(1).atDay(1).atStartOfDay();
+        long entriesThisMonth = stockMovementRepository.countByUserAndTypeAndCreatedAtBetween(
+                user, MovementType.ENTRY, monthStart, monthEnd
+        );
+        long exitsThisMonth = stockMovementRepository.countByUserAndTypeAndCreatedAtBetween(
+                user, MovementType.EXIT, monthStart, monthEnd
+        );
+
         return new DashboardResponseDTO(
                 totalProducts,
                 totalCategories,
@@ -75,7 +88,9 @@ public class DashboardService {
                 totalItemsInStock,
                 lowStockProducts,
                 outOfStockProducts,
-                totalStockValue
+                totalStockValue,
+                entriesThisMonth,
+                exitsThisMonth
         );
     }
 

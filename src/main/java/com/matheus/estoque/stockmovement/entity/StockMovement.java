@@ -36,7 +36,7 @@ public class StockMovement {
     @Enumerated(EnumType.STRING)
     @Column(length = 40)
     @Builder.Default
-    private InventoryOrigin origin = InventoryOrigin.OTHER;
+    private InventoryOrigin origin = InventoryOrigin.OUTRO;
 
     @Column(length = 2000)
     private String notes;

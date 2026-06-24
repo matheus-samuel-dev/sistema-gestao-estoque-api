@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleLargeFile(MaxUploadSizeExceededException ex) {
         return ResponseEntity.badRequest().body(Map.of(
                 "timestamp", LocalDateTime.now(),
-                "message", "O arquivo excede o limite permitido de 10 MB."
+                "message", "O arquivo excede o limite permitido de 5 MB."
         ));
     }
 

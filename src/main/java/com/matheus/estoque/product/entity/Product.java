@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.matheus.estoque.category.entity.Category;
+import com.matheus.estoque.supplier.entity.Supplier;
 import com.matheus.estoque.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -57,7 +58,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(length = 40)
     @Builder.Default
-    private InventoryOrigin origin = InventoryOrigin.OTHER;
+    private InventoryOrigin origin = InventoryOrigin.OUTRO;
 
     @Column(length = 2000)
     private String notes;
@@ -75,6 +76,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

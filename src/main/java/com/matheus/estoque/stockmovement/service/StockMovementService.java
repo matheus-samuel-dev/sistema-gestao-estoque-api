@@ -75,7 +75,7 @@ public class StockMovementService {
                 .product(product)
                 .quantity(dto.quantity())
                 .type(dto.type())
-                .origin(dto.origin() == null ? InventoryOrigin.OTHER : dto.origin())
+                .origin(dto.origin() == null ? InventoryOrigin.OUTRO : dto.origin())
                 .notes(dto.notes() == null || dto.notes().isBlank() ? null : dto.notes().trim())
                 .createdBy(user.getEmail())
                 .user(user)

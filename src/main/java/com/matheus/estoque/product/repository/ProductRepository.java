@@ -41,6 +41,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             UUID categoryId
     );
 
+    List<Product> findByUserAndSupplierIdAndActiveTrue(
+            User user,
+            UUID supplierId
+    );
+
     List<Product> findTop5ByUserAndActiveTrueOrderByIdDesc(User user);
 
     boolean existsByCategoryIdAndUser(
@@ -51,6 +56,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     long countByUserAndActiveTrue(User user);
 
     boolean existsByUserAndInternalCodeIgnoreCaseAndActiveTrue(User user, String internalCode);
+    boolean existsByUserAndInternalCodeIgnoreCase(User user, String internalCode);
     boolean existsByUserAndSkuIgnoreCaseAndActiveTrue(User user, String sku);
     boolean existsByUserAndBarcodeAndActiveTrue(User user, String barcode);
     boolean existsByUserAndInternalCodeIgnoreCaseAndIdNotAndActiveTrue(User user, String internalCode, UUID id);

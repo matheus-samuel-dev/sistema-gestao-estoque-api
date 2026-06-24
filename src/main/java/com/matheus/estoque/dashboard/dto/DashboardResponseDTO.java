@@ -9,5 +9,7 @@ public record DashboardResponseDTO(
         int totalItemsInStock,
         long lowStockProducts,
         long outOfStockProducts,
-        BigDecimal totalStockValue
+        BigDecimal totalStockValue,
+        long entriesThisMonth,
+        long exitsThisMonth
 ) {}
