@@ -1,160 +1,38 @@
-<div align="center">
+# 🚀 Sistema de Gestão de Estoque - Backend
 
-# 🚀 Sistema de Gestão de Estoque
+<p align="center">
+  <strong>API REST para gerenciamento de estoque, autenticação de usuários, produtos, categorias, fornecedores e movimentações.</strong>
+</p>
 
-Sistema web completo para gerenciamento de estoque desenvolvido com **Java Spring Boot**, **React** e **PostgreSQL**.
+<p align="center">
+  <a href="https://sistema-gestao-estoque-two.vercel.app">🌐 Demo Online</a>
+  •
+  <a href="https://github.com/matheus-samuel-dev/sistema-gestao-estoque">💻 Frontend</a>
+  •
+  <a href="https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api">⚙️ Backend</a>
+</p>
 
-O objetivo do projeto é permitir o controle de produtos, categorias e movimentações de estoque em tempo real, utilizando autenticação segura, dashboard analítico e persistência em banco de dados em nuvem.
-
-<br>
-
-![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge\&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=for-the-badge\&logo=springboot)
-![Spring Security](https://img.shields.io/badge/Spring_Security-Authentication-6DB33F?style=for-the-badge\&logo=springsecurity)
-![JWT](https://img.shields.io/badge/JWT-Security-black?style=for-the-badge\&logo=jsonwebtokens)
-![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge\&logo=react)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge\&logo=postgresql)
-![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge\&logo=swagger)
-![Railway](https://img.shields.io/badge/Railway-Backend-0B0D0E?style=for-the-badge\&logo=railway)
-![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge\&logo=vercel)
-
-</div>
-
----
-
-# 📑 Índice
-
-* 🌐 Aplicação Online
-* ⭐ Destaques Técnicos
-* 📸 Preview
-* ✨ Funcionalidades
-* 🏗 Arquitetura
-* 🔐 Segurança
-* 🛠 Tecnologias Utilizadas
-* ⚙️ Executando Localmente
-* 🚀 Próximas Evoluções
-* 👨‍💻 Autor
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk">
+  <img src="https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=for-the-badge&logo=springboot">
+  <img src="https://img.shields.io/badge/Spring_Security-JWT-6DB33F?style=for-the-badge&logo=springsecurity">
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql">
+  <img src="https://img.shields.io/badge/Railway-Deploy-0B0D0E?style=for-the-badge&logo=railway">
+</p>
 
 ---
 
-# 🌐 Demonstração
+## 🏗 Arquitetura
 
-### 🚀 Aplicação Online
+```text
+React + Vite
+      ↓
+Spring Boot REST API
+      ↓
+PostgreSQL
+```
 
-Acesse a versão em produção:
-
-🔗 https://sistema-gestao-estoque-two.vercel.app
-
----
-
-## 🔗 Repositórios do Projeto
-
-### Frontend (React + Vite)
-
-Interface web responsável pela experiência do usuário.
-
-https://github.com/matheus-samuel-dev/sistema-gestao-estoque
-
-### Backend (Java + Spring Boot)
-
-API REST responsável por autenticação, regras de negócio e persistência de dados.
-
-https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api
-
----
-
-# ⭐ Destaques Técnicos
-
-✅ Autenticação JWT
-
-✅ Recuperação de senha
-
-✅ Criptografia de senhas com BCrypt
-
-✅ Dashboard com indicadores e gráficos
-
-✅ Controle de produtos e categorias
-
-✅ Registro de entradas e saídas de estoque
-
-✅ Exportação PDF e Excel
-
-✅ API REST documentada com Swagger
-
-✅ Deploy completo (Railway + Vercel)
-
-✅ Interface responsiva para desktop e dispositivos móveis
-
----
-
-# 📸 Preview
-
-## 🔐 Login
-
-![Login](./docs/login.png)
-
-## 📊 Dashboard
-
-![Dashboard](./docs/dashboard.png)
-
-## 📈 Movimentações
-
-![Movimentações](./docs/movimentacoes.png)
-
-## 📦 Produtos
-
-![Produtos](./docs/produtos.png)
-
----
-
-# ✨ Funcionalidades
-
-## 🔐 Autenticação
-
-* Cadastro de usuários
-* Login com JWT
-* Recuperação de senha
-* Criptografia de senhas com BCrypt
-* Rotas protegidas com Spring Security
-
-## 📦 Gestão de Produtos
-
-* Cadastro de produtos
-* Atualização de produtos
-* Exclusão de produtos
-* Consulta de produtos
-* Controle de estoque
-
-## 🏷 Gestão de Categorias
-
-* Cadastro de categorias
-* Atualização de categorias
-* Exclusão de categorias
-* Organização dos produtos por categoria
-
-## 📊 Movimentações de Estoque
-
-* Registro de entradas
-* Registro de saídas
-* Histórico de movimentações
-* Atualização automática do estoque
-* Controle de usuários responsáveis
-
-## 📈 Dashboard Analítico
-
-* Quantidade de produtos cadastrados
-* Categorias ativas
-* Produtos sem estoque
-* Produtos com estoque baixo
-* Gráfico de entradas e saídas
-* Distribuição de produtos por categoria
-* Últimas movimentações realizadas
-
----
-
-# 🏗 Arquitetura
-
-O backend segue arquitetura em camadas para garantir organização, manutenção e escalabilidade.
+O backend segue uma arquitetura em camadas, separando responsabilidades entre controllers, services, repositories, DTOs, entidades e configurações de segurança.
 
 ```text
 Controller
@@ -166,97 +44,260 @@ Repository
 PostgreSQL
 ```
 
-### Estrutura principal
-
-```text
-src
-├── config
-├── security
-├── user
-├── product
-├── category
-├── stockmovement
-├── dto
-├── repository
-├── service
-└── exception
-```
-
 ---
 
-# 🔐 Segurança
+## ✨ Principais Funcionalidades
 
-A autenticação da aplicação utiliza JWT (JSON Web Token).
+### 🔐 Autenticação e Segurança
 
-### Fluxo de autenticação
-
-```text
-Usuário
-    ↓
-Login
-    ↓
-JWT
-    ↓
-Requisições Autenticadas
-```
-
-### Recursos implementados
-
-* Spring Security
-* JWT Authentication
-* BCrypt Password Encoder
-* Filtros de autenticação
+* Cadastro de usuários
+* Login com JWT
+* Recuperação de senha
+* Criptografia de senhas com BCrypt
 * Rotas públicas e protegidas
-* Controle de acesso baseado em autenticação
+* Filtro de autenticação com Spring Security
+
+### 📦 Produtos
+
+* Cadastro de produtos
+* Edição de produtos
+* Exclusão de produtos
+* Consulta de produtos
+* Controle de estoque
+* Código automático de produto
+* Importação de produtos por CSV/XLSX
+* Anexos de imagens e documentos
+
+### 🏷 Categorias e Fornecedores
+
+* CRUD de categorias
+* CRUD de fornecedores
+* Organização de produtos por categoria
+* Associação de fornecedores aos produtos
+
+### 📈 Movimentações de Estoque
+
+* Entrada de estoque
+* Saída de estoque
+* Ajuste
+* Transferência
+* Devolução
+* Histórico de movimentações
+* Atualização automática do saldo
+
+### 📊 Dashboard
+
+* Total de produtos
+* Total de categorias
+* Produtos sem estoque
+* Produtos com estoque baixo
+* Entradas e saídas do mês
+* Últimas movimentações
 
 ---
 
-# 🛠 Tecnologias Utilizadas
+## 📸 Preview
 
-## Backend
+### 📊 Dashboard
+
+<p align="center">
+  <img src="./docs/dashboard.png" width="100%">
+</p>
+
+### 🔍 Principais Telas
+
+| 🔐 Login              | 📈 Movimentações              |
+| --------------------- | ----------------------------- |
+| ![](./docs/login.png) | ![](./docs/movimentacoes.png) |
+
+| 📦 Produtos              | 📊 Dashboard              |
+| ------------------------ | ------------------------- |
+| ![](./docs/produtos.png) | ![](./docs/dashboard.png) |
+
+---
+
+## 🛠 Tecnologias Utilizadas
+
+### Backend
 
 * Java 21
 * Spring Boot
 * Spring Security
-* JWT
 * Spring Data JPA
 * Hibernate
+* JWT
+* BCrypt
 * Maven
 
-## Frontend
-
-* React
-* Vite
-* Material UI
-* Axios
-* React Router
-
-## Banco de Dados
+### Banco de Dados
 
 * PostgreSQL
 
-## Deploy
-
-* Railway
-* Vercel
-
-## Documentação
+### Documentação e Testes
 
 * Swagger / OpenAPI
+* JUnit
+
+### Deploy
+
+* Railway
+
+### Integração
+
+* React
+* Vite
+* Axios
+* Vercel
 
 ---
 
-# ⚙️ Executando Localmente
+## 📂 Estrutura do Projeto
+
+```text
+src
+├── main
+│   ├── java
+│   │   └── com
+│   │       └── matheus
+│   │           └── estoque
+│   │               ├── config
+│   │               ├── security
+│   │               ├── auth
+│   │               ├── user
+│   │               ├── product
+│   │               ├── category
+│   │               ├── supplier
+│   │               ├── stockmovement
+│   │               ├── attachment
+│   │               ├── settings
+│   │               └── exception
+│   └── resources
+└── test
+```
+
+---
+
+## 🔐 Segurança
+
+A API utiliza autenticação baseada em JWT.
+
+```text
+Usuário faz login
+        ↓
+Backend valida credenciais
+        ↓
+API retorna token JWT
+        ↓
+Frontend envia o token nas próximas requisições
+        ↓
+Backend valida o token e libera acesso aos recursos protegidos
+```
+
+Recursos aplicados:
+
+* Spring Security
+* JWT Authentication
+* BCrypt Password Encoder
+* Stateless Session
+* CORS configurado para integração com o frontend
+* Validação de usuário autenticado nas operações
+
+---
+
+## 🔗 Principais Endpoints
+
+### Autenticação
+
+```http
+POST /auth/register
+POST /auth/login
+POST /auth/forgot-password
+POST /auth/reset-password
+```
+
+### Produtos
+
+```http
+GET /products
+POST /products
+PUT /products/{id}
+DELETE /products/{id}
+POST /products/import
+```
+
+### Categorias
+
+```http
+GET /categories
+POST /categories
+PUT /categories/{id}
+DELETE /categories/{id}
+```
+
+### Fornecedores
+
+```http
+GET /suppliers
+POST /suppliers
+PUT /suppliers/{id}
+DELETE /suppliers/{id}
+```
+
+### Movimentações
+
+```http
+GET /stock-movements
+POST /stock-movements
+DELETE /stock-movements/{id}
+```
+
+### Anexos
+
+```http
+POST /attachments/products/{id}
+POST /attachments/movements/{id}
+GET /attachments/products/{id}
+GET /attachments/movements/{id}
+GET /attachments/{id}/download
+DELETE /attachments/{id}
+```
+
+---
+
+## ⚙️ Executando Localmente
+
+### Pré-requisitos
+
+* Java 21
+* Maven
+* PostgreSQL
+* Frontend em execução
+
+### Clonar o repositório
 
 ```bash
 git clone https://github.com/matheus-samuel-dev/sistema-gestao-estoque-api.git
-
 cd sistema-gestao-estoque-api
+```
 
+### Configurar variáveis de ambiente
+
+Crie ou configure as variáveis necessárias para conexão com o banco e autenticação.
+
+```env
+DATABASE_URL=jdbc:postgresql://localhost:5432/stock_management
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=sua_senha
+JWT_SECRET=sua_chave_secreta
+```
+
+### Executar o backend
+
+```bash
 mvn spring-boot:run
 ```
 
-Backend disponível em:
+A API ficará disponível em:
 
 ```text
 http://localhost:8080
@@ -264,11 +305,21 @@ http://localhost:8080
 
 ---
 
-# 🚀 Próximas Evoluções
+## 🚀 Deploy
 
-* [ ] Controle de permissões ADMIN e USER
-* [ ] Multiusuário com isolamento de dados
-* [ ] Docker
+O backend foi preparado para deploy no Railway com PostgreSQL em nuvem.
+
+O frontend está publicado na Vercel:
+
+```text
+https://sistema-gestao-estoque-two.vercel.app
+```
+
+---
+
+## 🚀 Próximas Evoluções
+
+* [ ] Controle avançado de permissões ADMIN e USER
 * [ ] Testes unitários com JUnit
 * [ ] Testes de integração
 * [ ] Pipeline CI/CD
@@ -277,22 +328,21 @@ http://localhost:8080
 * [ ] Auditoria de movimentações
 * [ ] Monitoramento e métricas
 * [ ] Versionamento de API
-* [ ] Exportação avançada de relatórios
+* [ ] Relatórios avançados
+* [ ] Docker e Docker Compose
 
 ---
 
-# 👨‍💻 Autor
+## 👨‍💻 Autor
 
-## Matheus Samuel Baena Soares
+### Matheus Samuel Baena Soares
 
 Desenvolvedor de Software com foco em Java, Spring Boot e desenvolvimento de aplicações web.
 
-🌐 Portfólio
+🔗 Portfólio: https://matheus-samuel-dev.github.io/Portfolio/
 
-https://matheus-samuel-dev.github.io/Portfolio/
+🔗 LinkedIn: https://linkedin.com/in/matheus-samuel-dev/
 
-💼 LinkedIn
-
-https://www.linkedin.com/in/matheus-samuel-dev/
+---
 
 ⭐ Se gostou do projeto, considere deixar uma estrela no repositório.
