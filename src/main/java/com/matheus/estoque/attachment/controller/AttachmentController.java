@@ -67,6 +67,16 @@ public class AttachmentController {
                 .body(file.data());
     }
 
+    @GetMapping("/attachments/{attachmentId}/view")
+    public ResponseEntity<byte[]> view(@PathVariable UUID attachmentId) {
+        AttachmentFileDTO file = service.viewImage(attachmentId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(file.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sanitize(file.fileName()) + "\"")
+                .body(file.data());
+    }
+
     @DeleteMapping("/attachments/{attachmentId}")
     public ResponseEntity<Void> delete(@PathVariable UUID attachmentId) {
         service.delete(attachmentId);

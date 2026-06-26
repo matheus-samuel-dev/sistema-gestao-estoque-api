@@ -48,5 +48,11 @@ public interface AttachmentRepository extends JpaRepository<Attachment, UUID> {
             @Param("user") User user
     );
 
+    Optional<Attachment> findFirstByProductIdAndUserAndContentTypeStartingWithOrderByCreatedAtAsc(
+            UUID productId,
+            User user,
+            String contentTypePrefix
+    );
+
     Optional<Attachment> findByIdAndUser(UUID id, User user);
 }

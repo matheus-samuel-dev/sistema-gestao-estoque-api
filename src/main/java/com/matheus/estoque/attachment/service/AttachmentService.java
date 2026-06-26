@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -82,26 +83,67 @@ public class AttachmentService {
 
     @Transactional(readOnly = true)
     public AttachmentFileDTO download(UUID id) {
-        Attachment attachment = repository.findByIdAndUser(id, authenticatedUsers.getCurrentUser())
-                .orElseThrow(() -> new RuntimeException("Anexo não encontrado. Atualize a página e tente novamente."));
-
-        byte[] data = attachment.getData();
-        if (data == null || data.length == 0) {
-            throw new RuntimeException("Não foi possível abrir este anexo. Envie o arquivo novamente.");
-        }
-
+        Attachment attachment = findOwnedAttachment(id);
         return new AttachmentFileDTO(
                 attachment.getFileName(),
                 attachment.getContentType(),
-                data
+                readData(attachment)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public AttachmentFileDTO viewImage(UUID id) {
+        Attachment attachment = findOwnedAttachment(id);
+        if (!isImage(attachment.getContentType())) {
+            throw new RuntimeException("Não foi possível visualizar este arquivo.");
+        }
+        return new AttachmentFileDTO(
+                attachment.getFileName(),
+                attachment.getContentType(),
+                readData(attachment)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> findProductThumbnailUrl(Product product, User user) {
+        if (product == null || product.getId() == null) {
+            return Optional.empty();
+        }
+        return repository.findFirstByProductIdAndUserAndContentTypeStartingWithOrderByCreatedAtAsc(
+                        product.getId(),
+                        user,
+                        "image/"
+                )
+                .map(Attachment::getId)
+                .map(id -> "/attachments/" + id + "/view");
     }
 
     @Transactional
     public void delete(UUID id) {
-        Attachment attachment = repository.findByIdAndUser(id, authenticatedUsers.getCurrentUser())
+        repository.delete(findOwnedAttachment(id));
+    }
+
+    private Attachment findOwnedAttachment(UUID id) {
+        return repository.findByIdAndUser(id, authenticatedUsers.getCurrentUser())
                 .orElseThrow(() -> new RuntimeException("Anexo não encontrado. Atualize a página e tente novamente."));
-        repository.delete(attachment);
+    }
+
+    private byte[] readData(Attachment attachment) {
+        byte[] data = attachment.getData();
+        if (data != null && data.length > 0) {
+            return data;
+        }
+
+        try {
+            byte[] legacyData = attachment.getLegacyData();
+            if (legacyData != null && legacyData.length > 0) {
+                return legacyData;
+            }
+        } catch (RuntimeException ex) {
+            throw new AttachmentStorageException("Não foi possível abrir este anexo. Envie o arquivo novamente.", ex);
+        }
+
+        throw new RuntimeException("Não foi possível abrir este anexo. Envie o arquivo novamente.");
     }
 
     private Attachment save(MultipartFile file, User user, Product product, StockMovement movement) {
@@ -138,5 +180,9 @@ public class AttachmentService {
                 .movement(movement)
                 .user(user)
                 .build());
+    }
+
+    private boolean isImage(String contentType) {
+        return contentType != null && contentType.startsWith("image/");
     }
 }

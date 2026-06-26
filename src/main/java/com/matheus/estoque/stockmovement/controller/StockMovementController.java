@@ -1,6 +1,7 @@
 package com.matheus.estoque.stockmovement.controller;
 
 import com.matheus.estoque.stockmovement.dto.CreateStockMovementDTO;
+import com.matheus.estoque.stockmovement.dto.StockMovementDTO;
 import com.matheus.estoque.stockmovement.entity.StockMovement;
 import com.matheus.estoque.stockmovement.service.StockMovementService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,17 +42,17 @@ public class StockMovementController {
     @Operation(summary = "Listar movimentações")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
-    public Page<StockMovement> findAll(
+    public Page<StockMovementDTO> findAll(
             Pageable pageable
     ) {
-        return service.findAll(pageable);
+        return service.findAllDto(pageable);
     }
 
     @Operation(summary = "Buscar movimentação por ID")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
-    public StockMovement findById(@PathVariable UUID id) {
-        return service.findById(id);
+    public StockMovementDTO findById(@PathVariable UUID id) {
+        return service.findByIdDto(id);
     }
 
     @Operation(summary = "Excluir movimentação")
@@ -64,7 +65,7 @@ public class StockMovementController {
     @Operation(summary = "Relatório por período")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/report")
-    public List<StockMovement> report(
+    public List<StockMovementDTO> report(
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime start,
@@ -73,6 +74,6 @@ public class StockMovementController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime end
     ) {
-        return service.report(start, end);
+        return service.reportDto(start, end);
     }
 }

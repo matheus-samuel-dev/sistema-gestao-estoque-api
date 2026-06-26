@@ -1,9 +1,11 @@
 package com.matheus.estoque.product.service;
 
+import com.matheus.estoque.attachment.service.AttachmentService;
 import com.matheus.estoque.category.entity.Category;
 import com.matheus.estoque.category.repository.CategoryRepository;
 import com.matheus.estoque.exception.CategoryNotFoundException;
 import com.matheus.estoque.product.dto.CreateProductDTO;
+import com.matheus.estoque.product.dto.ProductDTO;
 import com.matheus.estoque.product.dto.UpdateProductDTO;
 import com.matheus.estoque.product.entity.Product;
 import com.matheus.estoque.product.repository.ProductRepository;
@@ -27,17 +29,20 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final SupplierRepository supplierRepository;
     private final AuthenticatedUserService authenticatedUserService;
+    private final AttachmentService attachmentService;
 
     public ProductService(
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
             SupplierRepository supplierRepository,
-            AuthenticatedUserService authenticatedUserService
+            AuthenticatedUserService authenticatedUserService,
+            AttachmentService attachmentService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.supplierRepository = supplierRepository;
         this.authenticatedUserService = authenticatedUserService;
+        this.attachmentService = attachmentService;
     }
 
     public Product create(CreateProductDTO dto) {
@@ -73,9 +78,20 @@ public class ProductService {
         return productRepository.findByUserAndActiveTrue(user, pageable);
     }
 
+    public Page<ProductDTO> findAllDto(Pageable pageable) {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndActiveTrue(user, pageable)
+                .map(product -> toDto(product, user));
+    }
+
     public Product findById(UUID id) {
         User user = authenticatedUserService.getCurrentUser();
         return findOwnedProduct(id, user);
+    }
+
+    public ProductDTO findByIdDto(UUID id) {
+        User user = authenticatedUserService.getCurrentUser();
+        return toDto(findOwnedProduct(id, user), user);
     }
 
     public Product update(UUID id, UpdateProductDTO dto) {
@@ -199,10 +215,26 @@ public class ProductService {
                 .findByUserAndQuantityLessThanAndActiveTrue(user, 10);
     }
 
+    public List<ProductDTO> findLowStockDto() {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndQuantityLessThanAndActiveTrue(user, 10)
+                .stream()
+                .map(product -> toDto(product, user))
+                .toList();
+    }
+
     public List<Product> findOutOfStock() {
         User user = authenticatedUserService.getCurrentUser();
         return productRepository
                 .findByUserAndQuantityAndActiveTrue(user, 0);
+    }
+
+    public List<ProductDTO> findOutOfStockDto() {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndQuantityAndActiveTrue(user, 0)
+                .stream()
+                .map(product -> toDto(product, user))
+                .toList();
     }
 
     public List<Product> searchByName(String name) {
@@ -214,10 +246,26 @@ public class ProductService {
                 );
     }
 
+    public List<ProductDTO> searchByNameDto(String name) {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndNameContainingIgnoreCaseAndActiveTrue(user, name)
+                .stream()
+                .map(product -> toDto(product, user))
+                .toList();
+    }
+
     public List<Product> findByCategory(UUID categoryId) {
         User user = authenticatedUserService.getCurrentUser();
         return productRepository
                 .findByUserAndCategoryIdAndActiveTrue(user, categoryId);
+    }
+
+    public List<ProductDTO> findByCategoryDto(UUID categoryId) {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndCategoryIdAndActiveTrue(user, categoryId)
+                .stream()
+                .map(product -> toDto(product, user))
+                .toList();
     }
 
     public List<Product> findBySupplier(UUID supplierId) {
@@ -226,10 +274,31 @@ public class ProductService {
                 .findByUserAndSupplierIdAndActiveTrue(user, supplierId);
     }
 
+    public List<ProductDTO> findBySupplierDto(UUID supplierId) {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findByUserAndSupplierIdAndActiveTrue(user, supplierId)
+                .stream()
+                .map(product -> toDto(product, user))
+                .toList();
+    }
+
     public List<Product> findLatestProducts() {
         User user = authenticatedUserService.getCurrentUser();
         return productRepository
                 .findTop5ByUserAndActiveTrueOrderByIdDesc(user);
+    }
+
+    public List<ProductDTO> findLatestProductsDto() {
+        User user = authenticatedUserService.getCurrentUser();
+        return productRepository.findTop5ByUserAndActiveTrueOrderByIdDesc(user)
+                .stream()
+                .map(product -> toDto(product, user))
+                .toList();
+    }
+
+    public ProductDTO toDto(Product product, User user) {
+        String thumbnailUrl = attachmentService.findProductThumbnailUrl(product, user).orElse(null);
+        return ProductDTO.from(product, thumbnailUrl);
     }
 
     private Product findOwnedProduct(

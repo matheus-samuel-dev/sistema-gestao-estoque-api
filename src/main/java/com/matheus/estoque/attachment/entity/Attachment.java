@@ -25,6 +25,11 @@ public class Attachment {
     @JdbcTypeCode(SqlTypes.VARBINARY)
     @Column(name = "data_bytes", columnDefinition = "bytea")
     private byte[] data;
+    @JsonIgnore
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "data", insertable = false, updatable = false)
+    private byte[] legacyData;
     @JsonIgnore @ManyToOne(fetch = FetchType.LAZY) private Product product;
     @JsonIgnore @ManyToOne(fetch = FetchType.LAZY) private StockMovement movement;
     @JsonIgnore @ManyToOne(fetch = FetchType.LAZY, optional = false) private User user;

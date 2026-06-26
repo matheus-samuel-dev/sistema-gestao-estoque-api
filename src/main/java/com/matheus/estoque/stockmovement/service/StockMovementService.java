@@ -1,10 +1,12 @@
 package com.matheus.estoque.stockmovement.service;
 
+import com.matheus.estoque.attachment.service.AttachmentService;
 import com.matheus.estoque.product.entity.Product;
 import com.matheus.estoque.product.entity.InventoryOrigin;
 import com.matheus.estoque.product.repository.ProductRepository;
 import com.matheus.estoque.security.AuthenticatedUserService;
 import com.matheus.estoque.stockmovement.dto.CreateStockMovementDTO;
+import com.matheus.estoque.stockmovement.dto.StockMovementDTO;
 import com.matheus.estoque.stockmovement.entity.MovementType;
 import com.matheus.estoque.stockmovement.entity.StockMovement;
 import com.matheus.estoque.stockmovement.repository.StockMovementRepository;
@@ -24,15 +26,18 @@ public class StockMovementService {
     private final StockMovementRepository stockMovementRepository;
     private final ProductRepository productRepository;
     private final AuthenticatedUserService authenticatedUserService;
+    private final AttachmentService attachmentService;
 
     public StockMovementService(
             StockMovementRepository stockMovementRepository,
             ProductRepository productRepository,
-            AuthenticatedUserService authenticatedUserService
+            AuthenticatedUserService authenticatedUserService,
+            AttachmentService attachmentService
     ) {
         this.stockMovementRepository = stockMovementRepository;
         this.productRepository = productRepository;
         this.authenticatedUserService = authenticatedUserService;
+        this.attachmentService = attachmentService;
     }
 
     @Transactional
@@ -89,9 +94,20 @@ public class StockMovementService {
         return stockMovementRepository.findByUser(user, pageable);
     }
 
+    public Page<StockMovementDTO> findAllDto(Pageable pageable) {
+        User user = authenticatedUserService.getCurrentUser();
+        return stockMovementRepository.findByUser(user, pageable)
+                .map(movement -> toDto(movement, user));
+    }
+
     public StockMovement findById(UUID id) {
         User user = authenticatedUserService.getCurrentUser();
         return findOwnedMovement(id, user);
+    }
+
+    public StockMovementDTO findByIdDto(UUID id) {
+        User user = authenticatedUserService.getCurrentUser();
+        return toDto(findOwnedMovement(id, user), user);
     }
 
     @Transactional
@@ -130,6 +146,26 @@ public class StockMovementService {
         User user = authenticatedUserService.getCurrentUser();
         return stockMovementRepository
                 .findByUserAndCreatedAtBetween(user, start, end);
+    }
+
+    public List<StockMovementDTO> reportDto(LocalDateTime start, LocalDateTime end) {
+        User user = authenticatedUserService.getCurrentUser();
+        return stockMovementRepository.findByUserAndCreatedAtBetween(user, start, end)
+                .stream()
+                .map(movement -> toDto(movement, user))
+                .toList();
+    }
+
+    public StockMovementDTO toDto(StockMovement movement, User user) {
+        return StockMovementDTO.from(movement, productServiceDto(movement, user));
+    }
+
+    private com.matheus.estoque.product.dto.ProductDTO productServiceDto(StockMovement movement, User user) {
+        if (movement.getProduct() == null) {
+            return null;
+        }
+        String thumbnailUrl = attachmentService.findProductThumbnailUrl(movement.getProduct(), user).orElse(null);
+        return com.matheus.estoque.product.dto.ProductDTO.from(movement.getProduct(), thumbnailUrl);
     }
 
     private StockMovement findOwnedMovement(

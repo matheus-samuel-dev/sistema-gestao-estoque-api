@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.matheus.estoque.product.dto.CreateProductDTO;
+import com.matheus.estoque.product.dto.ProductDTO;
 import com.matheus.estoque.product.entity.Product;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -61,8 +62,8 @@ public class ProductController {
     @Operation(summary = "Listar todos os produtos")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
-    public Page<Product> findAll(Pageable pageable) {
-        return service.findAll(pageable);
+    public Page<ProductDTO> findAll(Pageable pageable) {
+        return service.findAllDto(pageable);
     }
 
     @GetMapping("/teste-auth")
@@ -72,8 +73,8 @@ public class ProductController {
 
     @Operation(summary = "Buscar produto por ID")
     @GetMapping("/{id}")
-    public Product findById(@PathVariable UUID id) {
-        return service.findById(id);
+    public ProductDTO findById(@PathVariable UUID id) {
+        return service.findByIdDto(id);
     }
 
     @Operation(summary = "Atualizar produto")
@@ -94,42 +95,42 @@ public class ProductController {
     }
 
     @GetMapping("/low-stock")
-    public List<Product> findLowStock() {
-        return service.findLowStock();
+    public List<ProductDTO> findLowStock() {
+        return service.findLowStockDto();
     }
 
     @GetMapping("/out-of-stock")
-    public List<Product> findOutOfStock() {
-        return service.findOutOfStock();
+    public List<ProductDTO> findOutOfStock() {
+        return service.findOutOfStockDto();
     }
 
     @Operation(summary = "Buscar produtos pelo nome")
     @GetMapping("/search")
-    public List<Product> searchByName(
+    public List<ProductDTO> searchByName(
             @RequestParam String name
     ) {
-        return service.searchByName(name);
+        return service.searchByNameDto(name);
     }
 
     @Operation(summary = "Buscar produtos por categoria")
     @GetMapping("/category/{categoryId}")
-    public List<Product> findByCategory(
+    public List<ProductDTO> findByCategory(
             @PathVariable UUID categoryId
     ) {
-        return service.findByCategory(categoryId);
+        return service.findByCategoryDto(categoryId);
     }
 
     @Operation(summary = "Buscar produtos por fornecedor")
     @GetMapping("/supplier/{supplierId}")
-    public List<Product> findBySupplier(
+    public List<ProductDTO> findBySupplier(
             @PathVariable UUID supplierId
     ) {
-        return service.findBySupplier(supplierId);
+        return service.findBySupplierDto(supplierId);
     }
 
     @GetMapping("/latest")
-    public List<Product> findLatestProducts() {
-        return service.findLatestProducts();
+    public List<ProductDTO> findLatestProducts() {
+        return service.findLatestProductsDto();
     }
 
 
