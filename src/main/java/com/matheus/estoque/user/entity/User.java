@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,27 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Builder.Default
+    @Column
+    private Boolean emailVerified = false;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
+
+    @JsonIgnore
+    @Column(length = 120)
+    private String emailVerificationToken;
+
+    private LocalDateTime emailVerificationExpiresAt;
+
+    @JsonIgnore
+    @Column(length = 120)
+    private String invitationToken;
+
+    private LocalDateTime invitationExpiresAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

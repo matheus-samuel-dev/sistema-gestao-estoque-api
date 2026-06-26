@@ -7,6 +7,8 @@ import com.matheus.estoque.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -18,7 +20,11 @@ public class Attachment {
     @Column(nullable = false, length = 255) private String fileName;
     @Column(nullable = false, length = 120) private String contentType;
     @Column(nullable = false) private long size;
-    @JsonIgnore @Lob @Basic(fetch = FetchType.LAZY) @Column(nullable = false) private byte[] data;
+    @JsonIgnore
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.VARBINARY)
+    @Column(name = "data_bytes", columnDefinition = "bytea")
+    private byte[] data;
     @JsonIgnore @ManyToOne(fetch = FetchType.LAZY) private Product product;
     @JsonIgnore @ManyToOne(fetch = FetchType.LAZY) private StockMovement movement;
     @JsonIgnore @ManyToOne(fetch = FetchType.LAZY, optional = false) private User user;

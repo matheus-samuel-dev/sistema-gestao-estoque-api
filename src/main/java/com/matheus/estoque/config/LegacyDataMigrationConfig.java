@@ -21,6 +21,20 @@ public class LegacyDataMigrationConfig {
             jdbcTemplate.update("UPDATE stock_movements SET origin = 'COMPRA' WHERE origin = 'PURCHASE'");
             jdbcTemplate.update("UPDATE stock_movements SET origin = 'TRANSFERENCIA' WHERE origin = 'TRANSFER'");
             jdbcTemplate.update("UPDATE stock_movements SET origin = 'AJUSTE' WHERE origin = 'STOCK_ADJUSTMENT'");
+            jdbcTemplate.execute("ALTER TABLE attachments ADD COLUMN IF NOT EXISTS data_bytes bytea");
+            jdbcTemplate.execute("""
+                    DO $$
+                    BEGIN
+                        IF EXISTS (
+                            SELECT 1
+                            FROM information_schema.columns
+                            WHERE table_name = 'attachments'
+                              AND column_name = 'data'
+                        ) THEN
+                            ALTER TABLE attachments ALTER COLUMN data DROP NOT NULL;
+                        END IF;
+                    END $$;
+                    """);
         };
     }
 }
