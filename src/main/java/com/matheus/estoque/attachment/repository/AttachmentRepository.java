@@ -48,10 +48,18 @@ public interface AttachmentRepository extends JpaRepository<Attachment, UUID> {
             @Param("user") User user
     );
 
-    Optional<Attachment> findFirstByProductIdAndUserAndContentTypeStartingWithOrderByCreatedAtAsc(
-            UUID productId,
-            User user,
-            String contentTypePrefix
+    @Query("""
+            select a.id
+            from Attachment a
+            where a.product.id = :productId
+              and a.user = :user
+              and lower(a.contentType) like 'image/%'
+              and a.data is not null
+            order by a.createdAt asc
+            """)
+    Optional<UUID> findFirstReadableProductImageId(
+            @Param("productId") UUID productId,
+            @Param("user") User user
     );
 
     Optional<Attachment> findByIdAndUser(UUID id, User user);

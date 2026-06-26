@@ -109,12 +109,7 @@ public class AttachmentService {
         if (product == null || product.getId() == null) {
             return Optional.empty();
         }
-        return repository.findFirstByProductIdAndUserAndContentTypeStartingWithOrderByCreatedAtAsc(
-                        product.getId(),
-                        user,
-                        "image/"
-                )
-                .map(Attachment::getId)
+        return repository.findFirstReadableProductImageId(product.getId(), user)
                 .map(id -> "/attachments/" + id + "/view");
     }
 
